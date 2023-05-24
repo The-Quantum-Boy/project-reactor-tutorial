@@ -2,6 +2,7 @@ package com.sumit.services;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.List;
@@ -165,7 +166,90 @@ public class FluxAndMonoService {
     }
 
 
+    public Flux<String> fruitsFluxZip(){
+        var fruits = Flux.just("mongo","orange");
+        var veggies=Flux.just("tomato","lemon");
+        return Flux.zip(fruits,veggies,
+                (first,second)->first+second).log();
+    }
 
+    public Flux<String> fruitsFluxZipWith(){
+        var fruits = Flux.just("mongo","orange");
+        var veggies=Flux.just("tomato","lemon");
+        return fruits.zipWith(veggies,
+                (first,second)->first+second).log();
+    }
+
+    public Flux<String> fruitsFluxZipTuple(){
+        var fruits = Flux.just("mongo","orange");
+        var veggies=Flux.just("tomato","lemon");
+        var moreveggis=Flux.just("potato","beans");
+        return Flux.zip(fruits,veggies,moreveggis).log()
+                .map(objects -> objects.getT1()+objects.getT2()+objects.getT3()).log();
+    }
+
+
+    public Mono<String> fruitsMonoZipWith(){
+        var fruits = Mono.just("mongo");
+        var veggies=Mono.just("tomato");
+        return fruits.zipWith(veggies,
+                (first,second)->first+second).log();
+    }
+
+    public Flux<String> furuitsFluxFilterDoOn(int number){
+        return Flux.fromIterable(List.of("Mango","Orange","Banana"))
+                .filter(s->s.length()>number)
+                .doOnNext(System.out::println)
+                .doOnSubscribe(subscription -> System.out.println("subscription->"+subscription.toString()))
+                .doOnComplete(()-> System.out.println("completed -> "));
+    }
+
+    public Flux<String> fruitsFluxOnErrorReturn(){
+        return Flux.just("apple","mongo")
+                .concatWith(Flux.error(
+                        new RuntimeException("Exception occured")
+                ))
+                .onErrorReturn("Orange");
+    }
+
+    public Flux<String> fruitsFluxOnErrorContinue(){
+        return Flux.just("apple","mongo","orange")
+                .map(s->{
+                    if (s.equalsIgnoreCase("mongo"))
+                        throw new RuntimeException("Exception occured");
+                   return s.toUpperCase();
+                })
+                .onErrorContinue((e,f)->{
+                    System.out.println("e="+e);
+                    System.out.println("f="+f);
+                });
+    }
+
+
+    public Flux<String> fruitsFluxOnErrorMap(){
+        return Flux.just("apple","mongo","orange")
+                .map(s->{
+                    if (s.equalsIgnoreCase("mongo"))
+                        throw new RuntimeException("Exception occured");
+                    return s.toUpperCase();
+                })
+                .onErrorMap(throwable->{
+                    System.out.println("throwable = "+throwable);
+                    return new IllegalStateException("From onError Map");
+                });
+    }
+
+    public Flux<String> fruitsFluxdoOnError(){
+        return Flux.just("apple","mongo","orange")
+                .map(s->{
+                    if (s.equalsIgnoreCase("mongo"))
+                        throw new RuntimeException("Exception occured");
+                    return s.toUpperCase();
+                })
+                .doOnError(throwable->{
+                    System.out.println("throwable = "+throwable);
+                });
+    }
 
     public static void main(String[] args) {
         FluxAndMonoService fluxAndMonoService=new FluxAndMonoService();

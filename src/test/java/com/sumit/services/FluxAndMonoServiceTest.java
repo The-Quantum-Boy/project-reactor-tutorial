@@ -162,4 +162,87 @@ class FluxAndMonoServiceTest {
                 .expectNext("mongo", "orange", "tomato", "lemon")
                 .verifyComplete();
     }
+
+    @Test
+    void fruitsFluxZip() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxZip();
+        StepVerifier.create(fruitsFlux)
+                .expectNext("mongotomato","orangelemon")
+                .verifyComplete();
+    }
+
+    @Test
+    void fruitsFluxZipWith() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxZipWith();
+        StepVerifier.create(fruitsFlux)
+                .expectNext("mongotomato","orangelemon")
+                .verifyComplete();
+    }
+
+    @Test
+    void fruitsFluxZipTuple() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxZipTuple();
+        StepVerifier.create(fruitsFlux)
+                .expectNext("mongotomatopotato","orangelemonbeans")
+                .verifyComplete();
+    }
+
+
+    @Test
+    void fruitsMonoZipWith() {
+        var fruitsFlux=fluxAndMonoService.fruitsMonoZipWith();
+        StepVerifier.create(fruitsFlux)
+                .expectNext("mongotomato")
+                .verifyComplete();
+    }
+
+    @Test
+    void furuitsFluxFilterDoOn() {
+        var fruitsFlux=fluxAndMonoService.furuitsFluxFilterDoOn(5).log();
+        StepVerifier.create(fruitsFlux)
+                .expectNext("Orange","Banana")
+                .verifyComplete();
+    }
+
+    @Test
+    void fruitsFluxOnErrorReturn() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxOnErrorReturn()
+                .log();
+
+        StepVerifier.create(fruitsFlux)
+                .expectNext("apple","mongo","Orange")
+                .verifyComplete();
+    }
+
+    @Test
+    void fruitsFluxOnErrorContinue() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxOnErrorContinue()
+                .log();
+
+        StepVerifier.create(fruitsFlux)
+                .expectNext("APPLE","ORANGE")
+                .verifyComplete();
+    }
+
+    @Test
+    void fruitsFluxOnErrorMap() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxOnErrorMap()
+                .log();
+
+        StepVerifier.create(fruitsFlux)
+                .expectNext("APPLE")
+                .expectError(IllegalStateException.class)
+                .verify();
+    }
+
+    @Test
+    void fruitsFluxdoOnError() {
+        var fruitsFlux=fluxAndMonoService.fruitsFluxdoOnError()
+                .log();
+
+        StepVerifier.create(fruitsFlux)
+                .expectNext("APPLE")
+                .expectError(RuntimeException.class)
+                .verify();
+    }
 }
