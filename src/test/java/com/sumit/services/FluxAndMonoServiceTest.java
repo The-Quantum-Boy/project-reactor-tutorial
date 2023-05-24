@@ -1,6 +1,7 @@
 package com.sumit.services;
 
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Hooks;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifierOptions;
 
@@ -226,6 +227,7 @@ class FluxAndMonoServiceTest {
 
     @Test
     void fruitsFluxOnErrorMap() {
+//        Hooks.onOperatorDebug();
         var fruitsFlux=fluxAndMonoService.fruitsFluxOnErrorMap()
                 .log();
 
